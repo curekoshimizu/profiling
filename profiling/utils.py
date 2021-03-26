@@ -145,3 +145,13 @@ def deferral():
         while deferred:
             f, a, k = deferred.pop()
             f(*a, **k)
+
+try:
+    # time.clock was removed in python3.8
+    from time import clock
+except ImportError:
+    def clock():
+        return time.perf_counter()
+else:
+    def clock():
+        return time.clock()

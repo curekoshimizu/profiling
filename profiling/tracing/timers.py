@@ -7,7 +7,7 @@ from __future__ import absolute_import
 import sys
 import time
 
-from ..utils import Runnable, lazy_import
+from ..utils import Runnable, lazy_import, clock
 
 
 __all__ = ['Timer', 'ContextualTimer', 'ThreadTimer', 'GreenletTimer']
@@ -16,11 +16,9 @@ __all__ = ['Timer', 'ContextualTimer', 'ThreadTimer', 'GreenletTimer']
 class Timer(Runnable):
     """The basic timer."""
 
-    #: The raw function to get the CPU time.
-    clock = time.clock
-
     def __call__(self):
-        return self.clock()
+        #: The raw function to get the CPU time.
+        return clock()
 
     def run(self, profiler):
         yield
@@ -39,7 +37,7 @@ class ContextualTimer(Timer):
         paused_at, resumed_at = self._contextual_times.get(context, (0, 0))
         if resumed_at is None:  # paused
             return paused_at
-        return paused_at + self.clock() - resumed_at
+        return paused_at + clock() - resumed_at
 
     def pause(self, context=None):
         if context is None:
@@ -50,7 +48,7 @@ class ContextualTimer(Timer):
         if context is None:
             context = self.detect_context()
         paused_at, __ = self._contextual_times.get(context, (0, 0))
-        self._contextual_times[context] = (paused_at, self.clock())
+        self._contextual_times[context] = (paused_at, clock())
 
     def detect_context(self):
         raise NotImplementedError('detect_context() should be implemented')

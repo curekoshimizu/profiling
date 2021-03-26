@@ -8,7 +8,7 @@ from __future__ import absolute_import
 import time
 
 from .stats import RecordingStatistics
-from .utils import Runnable, frame_stack
+from .utils import Runnable, frame_stack, clock
 from .viewer import StatisticsTable, StatisticsViewer
 
 
@@ -38,7 +38,7 @@ class Profiler(Runnable):
         self.stats = RecordingStatistics()
 
     def start(self):
-        self._cpu_time_started = time.clock()
+        self._cpu_time_started = clock()
         self._wall_time_started = time.time()
         self.stats.clear()
         return super(Profiler, self).start()
@@ -57,7 +57,7 @@ class Profiler(Runnable):
     def result(self):
         """Gets the frozen statistics to serialize by Pickle."""
         try:
-            cpu_time = max(0, time.clock() - self._cpu_time_started)
+            cpu_time = max(0, clock() - self._cpu_time_started)
             wall_time = max(0, time.time() - self._wall_time_started)
         except AttributeError:
             cpu_time = wall_time = 0.0

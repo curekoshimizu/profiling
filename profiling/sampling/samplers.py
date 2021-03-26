@@ -8,12 +8,11 @@ import functools
 import signal
 import sys
 import threading
-import time
 import weakref
 
 import six.moves._thread as _thread
 
-from ..utils import Runnable, deferral
+from ..utils import Runnable, deferral, clock
 
 
 __all__ = ['Sampler', 'ItimerSampler', 'TracingSampler']
@@ -65,7 +64,7 @@ class TracingSampler(Sampler):
     sampled_at = 0
 
     def _profile(self, profiler, frame, event, arg):
-        t = time.clock()
+        t = clock()
         if t - self.sampled_at < self.interval:
             return
         self.sampled_at = t
